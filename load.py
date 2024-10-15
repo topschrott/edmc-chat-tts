@@ -28,7 +28,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'deps.pyz'))
 import edge_tts  # noqa: E402 pylint: disable=wrong-import-position,import-error,wrong-import-order
 
 
-# Define a namedtuple type called 'Person'
+# Type for TTS config
 _TTSConfig = namedtuple('TTSConfig', ['voice', 'volume', 'rate'])
 
 
