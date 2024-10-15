@@ -14,8 +14,6 @@ import myNotebook as nb
 from config import config
 from config import appname
 
-import playsound
-
 _plugin_name = os.path.basename(os.path.dirname(__file__))
 _logger = logging.getLogger(f'{appname}.{_plugin_name}')
 
@@ -50,6 +48,34 @@ class _EdgeTTSEngine:
                 sound_file.write(chunk["data"])
 
 
+class _WindowsPlaybackEngine:
+    """ Playback engine using the Windows MCI functions. """
+
+    def __init__(self):
+        from ctypes import windll, wintypes  # pylint: disable=import-outside-toplevel
+        self.__mci_send_string_w = windll.winmm.mciSendStringW
+        self.__mci_send_string_w.argtypes = [
+            wintypes.LPCWSTR,
+            wintypes.LPWSTR,
+            wintypes.UINT, wintypes.HANDLE
+        ]
+        self.__mci_send_string_w.restype = wintypes.UINT
+
+    def __send_command(self, command):
+        """ Send command to MCI system. """
+        error_code = self.__mci_send_string_w(command, None, 0, 0)
+        if error_code != 0:
+            raise Exception(f'Failed to execute "{command}": {error_code}')
+
+    def play(self, sound_file):
+        """ Play sound. """
+        try:
+            self.__send_command(f'open "{sound_file}"')
+            self.__send_command(f'play "{sound_file}" wait')
+        finally:
+            self.__send_command(f'close "{sound_file}"')
+
+
 class _MessagePlayer:
     """ Message player, hanlding tts conversion and playback. """
 
@@ -57,6 +83,7 @@ class _MessagePlayer:
         self.__tts_pool = ThreadPoolExecutor(max_workers=1)
         self.__play_pool = ThreadPoolExecutor(max_workers=1)
         self.__tts_engine = _EdgeTTSEngine()
+        self.__play_engine = _WindowsPlaybackEngine()
 
     def shutdown(self, wait=True):
         """ Shutdown player and all thread pools. """
@@ -80,15 +107,15 @@ class _MessagePlayer:
                 _logger.info(f'Writing to {sound_file.name}')
                 self.__tts_engine.create(message, sound_file, tts_config)
             self.__play_pool.submit(self.__play, sound_file)
-        except Exception:  # pylint: disable=broad-exception-caught
+        except Exception:
             _logger.exception('TTS failed')
 
     def __play(self, sound_file):
         try:
             _logger.info(f'Playing {sound_file.name}')
-            playsound.playsound(sound_file.name)
+            self.__play_engine.play(sound_file.name)
             os.unlink(sound_file.name)
-        except Exception:  # pylint: disable=broad-exception-caught
+        except Exception:
             _logger.exception('playback failed')
 
 
@@ -137,6 +164,7 @@ class _PluginConfigs(Enum):
 
 
 class _AutoRow:
+    """ Helper class for automatically incrementing a row counter. """
 
     def __init__(self):
         self.__cur_row = -1

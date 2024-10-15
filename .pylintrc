@@ -410,7 +410,9 @@ confidence=HIGH,
 # --disable=W".
 disable=logging-fstring-interpolation,
 	too-few-public-methods,
-	too-many-arguments
+	too-many-arguments,
+    broad-exception-caught,
+    broad-exception-raised
 #	raw-checker-failed,
 #        bad-inline-option,
 #        locally-disabled,
