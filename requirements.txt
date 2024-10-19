@@ -1,3 +1,5 @@
 requests
 flake8
 pylint
+pillow
+semantic_version
