@@ -126,6 +126,7 @@ class _PluginConfigs(Enum):
     SPEAK_SYSTEM_CHAT = 'chat_tts_speak_system_chat', True
     SPEAK_LOCAL_CHAT = 'chat_tts_speak_local_chat', True
     SPEAK_SQUADRON_CHAT = 'chat_tts_speak_squadron_chat', True
+    SPEAK_WING_CHAT = 'chat_tts_speak_squadron_chat', True
     SPEAK_DIRECT_CHAT = 'chat_tts_speak_direct_chat', True
     VOICE_NAME = 'chat_tts_voice_name', 'en-GB-SoniaNeural'
     VOICE_VOLUME_ADJUST = 'chat_tts_voice_volume_adjust', '-20%'
@@ -188,6 +189,7 @@ class _PluginPrefs:  # pylint: disable=too-many-instance-attributes
         self.__speak_system_chat = tk.IntVar(value=_PluginConfigs.SPEAK_SYSTEM_CHAT.get_bool_as_int())
         self.__speak_local_chat = tk.IntVar(value=_PluginConfigs.SPEAK_LOCAL_CHAT.get_bool_as_int())
         self.__speak_squadron_chat = tk.IntVar(value=_PluginConfigs.SPEAK_SQUADRON_CHAT.get_bool_as_int())
+        self.__speak_wing_chat = tk.IntVar(value=_PluginConfigs.SPEAK_WING_CHAT.get_bool_as_int())
         self.__speak_direct_chat = tk.IntVar(value=_PluginConfigs.SPEAK_DIRECT_CHAT.get_bool_as_int())
         self.__voice_name = tk.StringVar(value=_PluginConfigs.VOICE_NAME.get_str())
         self.__voice_volume_adjust = tk.StringVar(value=_PluginConfigs.VOICE_VOLUME_ADJUST.get_str())
@@ -267,6 +269,7 @@ class _PluginPrefs:  # pylint: disable=too-many-instance-attributes
             ('System chat', self.__speak_system_chat),
             ('Local chat', self.__speak_local_chat),
             ('Squadron chat', self.__speak_squadron_chat),
+            ('Wing chat', self.__speak_wing_chat),
             ('Direct messages', self.__speak_direct_chat)
         )
         for label, variable in fields:
@@ -328,6 +331,7 @@ class _PluginPrefs:  # pylint: disable=too-many-instance-attributes
         _PluginConfigs.SPEAK_SYSTEM_CHAT.set(self.__speak_system_chat.get())
         _PluginConfigs.SPEAK_LOCAL_CHAT.set(self.__speak_local_chat.get())
         _PluginConfigs.SPEAK_SQUADRON_CHAT.set(self.__speak_squadron_chat.get())
+        _PluginConfigs.SPEAK_WING_CHAT.set(self.__speak_wing_chat.get())
         _PluginConfigs.SPEAK_DIRECT_CHAT.set(self.__speak_direct_chat.get())
         _PluginConfigs.VOICE_NAME.set(self.__voice_name.get().strip())
         _PluginConfigs.VOICE_VOLUME_ADJUST.set(self.__voice_volume_adjust.get().strip())
@@ -345,9 +349,10 @@ class _PluginApp:
         """ Reload settings. """
         channel_config = {
             'npc': _PluginConfigs.SPEAK_NPC_CHAT.get_bool(),
-            'system': _PluginConfigs.SPEAK_SYSTEM_CHAT.get_bool(),
+            'starsystem': _PluginConfigs.SPEAK_SYSTEM_CHAT.get_bool(),
             'local': _PluginConfigs.SPEAK_LOCAL_CHAT.get_bool(),
             'squadron': _PluginConfigs.SPEAK_SQUADRON_CHAT.get_bool(),
+            'wing': _PluginConfigs.SPEAK_WING_CHAT.get_bool(),
             'player': _PluginConfigs.SPEAK_DIRECT_CHAT.get_bool()
         }
         self.__allowed_channels = {ch for ch, allowed in channel_config.items() if allowed}
